@@ -1,92 +1,45 @@
-// PlannedWorkout.js
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  FlatList,
-  TouchableOpacity,
-} from "react-native";
-import dayjs from "dayjs";
-import "dayjs/locale/fi";
-import { database, ref, push, onValue, remove } from "../../Firebase";
-import DatePicker from "react-native-date-picker";
+import { View, Text, FlatList, TouchableOpacity } from "react-native";
+import dayjs from "dayjs"; 
+import "dayjs/locale/fi"; 
+import { database, ref, push, onValue, remove } from "../../Firebase"; // Tuodaan tietokantaan liittyvät toiminnot
+import { AntDesign } from "@expo/vector-icons"; 
+import Toast from "react-native-toast-message"; 
 
 export default function PlannedWorkout() {
-  const [workout, setWorkout] = useState({
-    date: dayjs(new Date()).locale("fi").format("YYYY-MM-DD"),
-    exercises: "",
-    duration: "",
-  });
-  const [workouts, setWorkouts] = useState([]);
-  const [open, setOpen] = useState(false);
+  const [workouts, setWorkouts] = React.useState([]); // Tilamuuttuja treenien tallentamiseen
+  const [selectedDate, setSelectedDate] = React.useState(""); // Tilamuuttuja valitulle päivämäärälle
 
-  useEffect(() => {
-    // Kuuntele muutoksia Firebase-tietokannassa ja päivitä workouts-tila
-    const itemsRef = ref(database, "workouts");
-    onValue(itemsRef, (snapshot) => {
-      const data = snapshot.val();
+  React.useEffect(() => {
+    const itemsRef = ref(database, "workouts"); // Viittaus tietokantaan
+    const unsubscribe = onValue(itemsRef, (snapshot) => { // Tilannetta seuraava kuuntelija
+      const data = snapshot.val(); // Haetaan tietokannasta tiedot
       if (data) {
-        setWorkouts(Object.entries(data)); // Tallennetaan workouts kuten [key, value] -pareina
+        setWorkouts(Object.entries(data)); // Asetetaan treenit tilamuuttujaan
       } else {
-        setWorkouts([]);
+        setWorkouts([]); // Tyhjennetään treenit, jos tietoja ei löytynyt
       }
     });
+
+    return () => unsubscribe(); // Kuuntelijan poisto purkaessa komponenttia
   }, []);
 
-  const handleInputChange = (key, value) => {
-    setWorkout({ ...workout, [key]: value });
-  };
-
-  const handleSaveWorkout = () => {
-    push(ref(database, "workouts"), workout);
-    setWorkout({ ...workout, exercises: "", duration: "" });
-  };
-
+  // Poista treeni tietokannasta ja näytä onnistunut ilmoitus
   const handleDeleteWorkout = (key) => {
-    remove(ref(database, `workouts/${key}`)); // Poista treeni tietokannasta
+    remove(ref(database, `workouts/${key}`));
+    Toast.show({
+      type: "success",
+      text1: "Deleted successfully", // Onnistuneen poiston ilmoitus
+    });
+  };
+
+  // Käsittele päivän painallus
+  const handleDayPress = (day) => {
+    setSelectedDate(day.dateString); // Aseta valittu päivämäärä tilamuuttujaan
   };
 
   return (
     <View style={{ flex: 1, padding: 20 }}>
-      <Text>Treeniohjelma:</Text>
-      <TextInput
-        style={{
-          height: 40,
-          borderColor: "gray",
-          borderWidth: 1,
-          marginBottom: 10,
-        }}
-        placeholder="Päivämäärä"
-        value={workout.date}
-        onChangeText={(text) => handleInputChange("date", text)}
-      />
-   
-      <TextInput
-        style={{
-          height: 40,
-          borderColor: "gray",
-          borderWidth: 1,
-          marginBottom: 10,
-        }}
-        placeholder="Liikkeet"
-        value={workout.exercises}
-        onChangeText={(text) => handleInputChange("exercises", text)}
-      />
-      <TextInput
-        style={{
-          height: 40,
-          borderColor: "gray",
-          borderWidth: 1,
-          marginBottom: 10,
-        }}
-        placeholder="Kesto"
-        value={workout.duration}
-        onChangeText={(text) => handleInputChange("duration", text)}
-      />
-      <Button title="Tallenna treeni" onPress={handleSaveWorkout} />
-
       <FlatList
         data={workouts}
         renderItem={({ item }) => (
@@ -103,7 +56,12 @@ export default function PlannedWorkout() {
               </Text>
               <Text>Liikkeet: {item[1].exercises}</Text>
               <Text>Kesto: {item[1].duration}</Text>
-              <Text style={{ color: "red" }}>Poista</Text>
+              <TouchableOpacity
+                style={{ position: "absolute", top: 10, right: 10 }}
+                onPress={() => handleDeleteWorkout(item[0])}
+              >
+                <AntDesign name="delete" size={20} color="red" />
+              </TouchableOpacity>
             </View>
           </TouchableOpacity>
         )}

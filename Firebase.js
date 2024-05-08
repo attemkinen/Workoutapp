@@ -1,15 +1,16 @@
+import { initializeApp } from "firebase/app"; 
+import { getDatabase, push, ref, onValue, remove } from "firebase/database"; 
 
-import { initializeApp } from "firebase/app";
-import { getDatabase,push,ref,onValue,remove } from "firebase/database";
+// Alustetaan muuttujat Firebase-projektin konfigurointitiedoille
+const apiKey = process.env.EXPO_PUBLIC_ApiKey; // API-avain
+const authDomain = process.env.EXPO_PUBLIC_authDomain; // Authentikointialue
+const databaseURL = process.env.EXPO_PUBLIC_databaseURL; // Tietokannan URL
+const projectId = process.env.EXPO_PUBLIC_projectId; // Projektin tunnus
+const storageBucket = process.env.EXPO_PUBLIC_storageBucket; // Tallennusämpäri
+const messagingSenderId = process.env.EXPO_PUBLIC_messagingSenderId; // Viestien lähettäjän tunnus
+const appId = process.env.EXPO_PUBLIC_APP_ID; // Sovelluksen tunnus
 
-const apiKey = process.env.EXPO_PUBLIC_ApiKey
-const authDomain = process.env.EXPO_PUBLIC_authDomain
-const databaseURL = process.env.EXPO_PUBLIC_databaseURL
-const projectId =process.env.EXPO_PUBLIC_projectId
-const storageBucket= process.env.EXPO_PUBLIC_storageBucket
-const messagingSenderId = process.env.EXPO_PUBLIC_messagingSenderId
-const appId = process.env.EXPO_PUBLIC_APP_ID
-
+// Luodaan Firebase-konfiguraatiokokonaisuus
 const firebaseConfig = {
   apiKey: apiKey,
   authDomain: authDomain,
@@ -20,10 +21,9 @@ const firebaseConfig = {
   appId: appId,
 };
 
-// Initialize Firebase
+// Alustetaan Firebase käyttäen konfiguraatiota
+const app = initializeApp(firebaseConfig); // Alustetaan Firebase-sovellus
+const database = getDatabase(app); // Haetaan Firebase-tietokanta
 
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app)
-ref(database, "workouts/")
-
-export {database,ref,onValue,remove, push}
+// Eksportoidaan tietokanta ja tietokantatoiminnot moduulina
+export { database, ref, onValue, remove, push };
