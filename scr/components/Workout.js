@@ -7,15 +7,14 @@ import {
   View,
   Text,
 } from "react-native";
-import { styles } from "./Styles"; // Tuodaan tyylitiedosto
-import Toast from "react-native-toast-message"; // Tuodaan Toast-ilmoitusten komponentti
+import { styles } from "./Styles";
+import Toast from "react-native-toast-message";
 
 export default function Workout() {
-  const [keyword, setKeyword] = useState(""); // Tilamuuttuja hakusanan tallentamiseen
-  const [workouts, setWorkouts] = useState([]); // Tilamuuttuja treenien tallentamiseen
-  const [showMessage, setShowMessage] = useState(true); // Tilamuuttuja viestin näyttämiseen
+  const [keyword, setKeyword] = useState("");
+  const [workouts, setWorkouts] = useState([]);
+  const [showMessage, setShowMessage] = useState(true);
 
-  // Funktio hakee treenit API:sta hakusanan perusteella
   const getWorkouts = () => {
     setShowMessage(false); // Piilotetaan viesti haun jälkeen
     fetch(`https://api.api-ninjas.com/v1/exercises?muscle=${keyword}`, {
@@ -33,16 +32,16 @@ export default function Workout() {
       })
       .then((data) => {
         if (data && data.length > 0) {
-          setWorkouts(data); // Asetetaan haetut treenit tilamuuttujaan
+          setWorkouts(data);
           Toast.show({
             type: "success",
-            text1: "Search completed", // Ilmoitus onnistuneesta haula
+            text1: "Search completed",
           });
         } else {
           console.log("No workouts found");
           Toast.show({
             type: "error",
-            text1: "No workouts found.", // Ilmoitus ettei treenejä löytynyt
+            text1: "No workouts found.",
           });
         }
       })
@@ -51,7 +50,6 @@ export default function Workout() {
       });
   };
 
-  // Komponentti joka renderöi yksittäisen treenin tiedot
   const renderWorkoutDetails = ({ item }) => (
     <View style={styles.workoutContainer}>
       <Text style={styles.title}>Workout Details</Text>
@@ -78,7 +76,6 @@ export default function Workout() {
     </View>
   );
 
-  // Komponentti joka näyttää viestin hakuvaihtoehdoista
   const showOptions = () => {
     return (
       <Text style={styles.message}>
@@ -87,7 +84,6 @@ export default function Workout() {
     );
   };
 
-  // Renderöi näkymän, hakukentän, viestin ja hakutulokset
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
@@ -101,15 +97,15 @@ export default function Workout() {
           <AntDesign name="search1" size={30} color="black" />
         </TouchableOpacity>
       </View>
-      {showMessage && showOptions()} // Näytetään hakuvaihtoehdot, jos viesti on näkyvissä
-      {workouts.length > 0 && ( // Näytetään hakutulokset, jos niitä on
+      {showMessage && showOptions()}
+      {workouts.length > 0 && (
         <FlatList
           data={workouts}
           renderItem={renderWorkoutDetails}
           keyExtractor={(item, index) => index.toString()}
         />
       )}
-      <Toast /> // Näytetään Toast-ilmoitukset
+      <Toast />
     </View>
   );
 }

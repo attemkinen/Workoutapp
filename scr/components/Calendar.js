@@ -244,9 +244,9 @@ const MyCalendar = () => {
                 name="close"
                 size={24}
                 color="black"
-                style={{ marginRight: 5 }}
+                style={{ marginRight: 5, paddingBottom:10 }}
               />
-              <Text style={{ fontSize: 16, color: "black" }}>Close</Text>
+              <Text style={{ fontSize: 16, color: "black", paddingBottom:10 }}>Close</Text>
             </TouchableOpacity>
             {/* Tarkistetaan, onko päivälle merkitty tapahtumia */}
             {selectedWorkouts.length === 0 ? (
@@ -255,8 +255,9 @@ const MyCalendar = () => {
                   style={{
                     fontSize: 18,
                     fontWeight: "bold",
+                    textAlign: "left",
                     paddingTop:20,
-                    
+                   
                   }}
                 >
                   No events for this day
@@ -281,6 +282,7 @@ const MyCalendar = () => {
                         flexDirection: "row",
                         justifyContent: "space-between",
                         alignItems: "center",
+                        paddingTop:10
                       }}
                     >
                       <View>
